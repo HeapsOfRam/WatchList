@@ -5,6 +5,7 @@
 package watchlist;
 
 import java.util.*;
+import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -12,17 +13,19 @@ import javax.swing.*;
 public class ControlPanel extends JPanel{
     private ViewPanel view;
     private TextPanel text;
+    private String filename = "shows.txt";
     
     JButton addButton, deleteButton, editButton, helpButton, exitButton;
     JPanel buttonPanel;
     
     ButtonHandler action;
 
-    private ArrayList<Show> list = new <Show>ArrayList();
+    private ArrayList<Show> list;// = new <Show>ArrayList();
     
-    public ControlPanel(ViewPanel view, TextPanel text){
+    public ControlPanel(ViewPanel view, TextPanel text, ArrayList<Show> list){
         this.view = view;
         this.text = text;
+        this.list = list;
         
         buttonPanel = new JPanel();
         action = new ButtonHandler();
@@ -66,7 +69,7 @@ public class ControlPanel extends JPanel{
             Show show;
             String name;
             int episode, totEps, rating;
-            boolean finished, movie, match;
+            boolean finished, movie;
             
             if(e.getActionCommand().equals("ADD")){
                 name = text.getName();
@@ -76,24 +79,12 @@ public class ControlPanel extends JPanel{
                 movie = text.getMovie();
                 rating = text.getRating();
                 show = new Show(name, episode, totEps, finished, movie, rating);
-                Iterator<Show> iter = list.iterator();
-                Show temp;
-                match = false;
                 
-                while(iter.hasNext()){
-                    temp = iter.next();
-                    if(name.equals(temp.getName())){
-                        match = true;
-                        list.remove(temp);
-                        view.removeFromModel(temp);
-                        list.add(show);
-                        view.addToModel(show);
-                    }
-                }
-                if(!match){
-                    list.add(show);
-                    view.addToModel(show);
-                }
+                showInList(show);
+                
+                list.add(show);
+                view.addToModel(show);
+                    
                 System.out.println(show);
                 text.resetFields();
             }
@@ -131,9 +122,49 @@ public class ControlPanel extends JPanel{
                         + "For rating, give your own personal rating of the show out of 10", "Help Menu", JOptionPane.PLAIN_MESSAGE);
             }
             if(e.getActionCommand().equals("EXIT")){
-                //write out to file
+                writeToFile();
                 System.exit(0);
             }
         }        
+        
+        public Show showInList(Show show){
+            Iterator<Show> iter = list.iterator();
+            Show temp;                
+            while(iter.hasNext()){
+                temp = iter.next();
+                if(show.getName().equals(temp.getName())){
+                    list.remove(temp);
+                    view.removeFromModel(temp);
+                    return temp;
+                    //list.add(show);
+                    //view.addToModel(show);
+                }
+            } 
+            return null;
+        }
+        
+        public void writeToFile(){
+            Iterator<Show> iter = list.iterator();
+            Show temp;
+            
+            try{
+                File file = new File(filename);
+                if(!file.exists()){
+                    file.createNewFile();
+                }
+                
+                FileWriter fw = new FileWriter(file.getAbsoluteFile());
+                BufferedWriter bw = new BufferedWriter(fw);
+                
+                while(iter.hasNext()){
+                    temp = iter.next();
+                    bw.write(temp.saveString());
+                }
+                bw.close();
+            }
+            catch(IOException e){
+                System.out.println("IOException " + e);
+            }
+        }
     }    
 }

@@ -155,6 +155,6 @@ public class Show implements Comparable{
     }
     
     public String saveString(){
-        return name + "," + episode + "," + totEpisodes + "," + finished + "," + movie + "," + rating;
+        return name + "," + episode + "," + totEpisodes + "," + finished + "," + movie + "," + rating + "\n";
     }
 }
