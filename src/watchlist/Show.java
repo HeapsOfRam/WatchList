@@ -4,7 +4,7 @@
  */
 package watchlist;
 
-public class Show {
+public class Show implements Comparable{
     private int episode, totEpisodes;
     private boolean finished, movie;
     private String name;
@@ -64,6 +64,15 @@ public class Show {
         rating = 0;
     }
     
+    public Show(boolean movie, String name){
+        this.name = name;
+        this.movie = movie;
+        finished = false;
+        episode = 1;
+        totEpisodes = 1;
+        rating = 0;
+    }
+    
     public Show(String name, int episode, int totEpisodes, boolean finished, int rating){
         this.name = name;
         this.episode = episode;
@@ -80,6 +89,21 @@ public class Show {
         this.finished = finished;
         this.movie = movie;
         this.rating = rating;
+    }
+    
+    public int compareTo(Object o){
+        Show s = (Show) o;
+        if(s.getName() == name)
+            return 0;
+        else
+            return -1;
+    }
+    
+    public boolean equals(Object o){
+        Show s = (Show) o;
+        if(s.getName() == name)
+            return true;
+        return false;
     }
     
     public void setName(String name)
@@ -118,7 +142,19 @@ public class Show {
     public int getRating()
     {return rating;}
     
+    /*public String toString(){
+        if(movie)
+            return name + "\tStatus: " + finished;
+        return name + " = Episode " + episode + " out of " + totEpisodes + "\tRATING: " + rating;
+    }*/
+    
     public String toString(){
-        return name + "," + finished + "," + movie + "," + ((finished) ? rating : episode) + "," + totEpisodes;
+        if(movie)
+            return name + "\tStatus: " + finished;
+        return name + " " + ((finished) ? "      OVERALL RATING: " + rating : "      Episode " + episode + " out of " + totEpisodes);
+    }
+    
+    public String saveString(){
+        return name + "," + episode + "," + totEpisodes + "," + finished + "," + movie + "," + rating;
     }
 }

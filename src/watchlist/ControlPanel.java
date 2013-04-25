@@ -66,7 +66,7 @@ public class ControlPanel extends JPanel{
             Show show;
             String name;
             int episode, totEps, rating;
-            boolean finished, movie;
+            boolean finished, movie, match;
             
             if(e.getActionCommand().equals("ADD")){
                 name = text.getName();
@@ -76,19 +76,59 @@ public class ControlPanel extends JPanel{
                 movie = text.getMovie();
                 rating = text.getRating();
                 show = new Show(name, episode, totEps, finished, movie, rating);
-                list.add(show);
-                view.addToModel(show);
+                Iterator<Show> iter = list.iterator();
+                Show temp;
+                match = false;
+                
+                while(iter.hasNext()){
+                    temp = iter.next();
+                    if(name.equals(temp.getName())){
+                        match = true;
+                        list.remove(temp);
+                        view.removeFromModel(temp);
+                        list.add(show);
+                        view.addToModel(show);
+                    }
+                }
+                if(!match){
+                    list.add(show);
+                    view.addToModel(show);
+                }
                 System.out.println(show);
                 text.resetFields();
             }
             if(e.getActionCommand().equals("DELETE")){
-                
+                if(view.getSelectedShow() != null){
+                    show = view.getSelectedShow();
+                    list.remove(show);
+                    view.removeFromModel(show);
+                }
             }
             if(e.getActionCommand().equals("EDIT")){
-                
+                if(view.getSelectedShow() != null){
+                    show = view.getSelectedShow();
+                    text.setName(show.getName());
+                    text.setEpisodes(show.getEpisode());
+                    text.setTotEps(show.getTotEpisode());
+                    text.setRating(show.getRating());
+                    text.setFin(show.getFinished());
+                    text.setMovie(show.getMovie());
+                }
             }
             if(e.getActionCommand().equals("HELP")){
-                
+                JOptionPane.showMessageDialog(null, "Welcome to the WatchList!\n"
+                        + "This program helps keep track of shows you are watching or have watched\n"
+                        + "\nAdd adds a show to the list\n"
+                        + "Delete removes a show from the list\n"
+                        + "Edit edits a show in the list\n"
+                        + "Help displays this menu\n"
+                        + "Exit quits the program, and saves your list\n"
+                        + "\nName is the name of the show\n"
+                        + "Episode is the current episode you are on\n"
+                        + "Total is the total number of episodes in the series\n"
+                        + "If you have finished the series, make sure to select \"Finished\" in status\n"
+                        + "If the show is a movie, make sure to select that in movie\n"
+                        + "For rating, give your own personal rating of the show out of 10", "Help Menu", JOptionPane.PLAIN_MESSAGE);
             }
             if(e.getActionCommand().equals("EXIT")){
                 //write out to file
